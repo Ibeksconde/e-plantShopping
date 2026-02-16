@@ -1,59 +1,30 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux'; // Import for Redux
-import { addItem } from './CartSlice'; // Ensure this path matches your file structure
+import { useDispatch, useSelector } from 'react-redux'; // Import useSelector to access Redux state
+import { addItem } from './CartSlice';
 import './ProductList.css';
 import CartItem from './CartItem';
 
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
-    const [addedToCart, setAddedToCart] = useState({}); // Task 4: State to track added products
-    const dispatch = useDispatch(); // Initialize Redux dispatch
+    const [addedToCart, setAddedToCart] = useState({});
+    const dispatch = useDispatch();
+
+    // Task 4.1: Access the Redux store to retrieve and display the total quantity of items
+    const cartItems = useSelector(state => state.cart.items);
+    
+    // Calculate total quantity by summing the 'quantity' property of all items in the cart
+    const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     const plantsArray = [
-        {
-            category: "Air Purifying Plants",
-            plants: [
-                {
-                    name: "Snake Plant",
-                    image: "https://cdn.pixabay.com/photo/2021/01/22/06/04/snake-plant-5939187_1280.jpg",
-                    description: "Produces oxygen at night, improving air quality.",
-                    cost: "$15"
-                },
-                {
-                    name: "Spider Plant",
-                    image: "https://cdn.pixabay.com/photo/2018/07/11/06/47/chlorophytum-3530413_1280.jpg",
-                    description: "Filters formaldehyde and xylene from the air.",
-                    cost: "$12"
-                }
-                // ... (rest of your plantsArray data)
-            ]
-        },
-        {
-            category: "Aromatic Fragrant Plants",
-            plants: [
-                {
-                    name: "Lavender",
-                    image: "https://images.unsplash.com/photo-1611909023032-2d6b3134ecba?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                    description: "Calming scent, used in aromatherapy.",
-                    cost: "$20"
-                }
-                // ... (rest of your plantsArray data)
-            ]
-        }
+        // ... (your plant categories and data)
     ];
 
-    // Task 5 & 6: Add to Cart Functionality
     const handleAddToCart = (plant) => {
-        dispatch(addItem(plant)); // Dispatch action to Redux
+        dispatch(addItem(plant)); // Dispatch plant details to Redux
         setAddedToCart((prevState) => ({
             ...prevState,
-            [plant.name]: true, // Set product name as key and true as value
+            [plant.name]: true, // Track added product by name as key
         }));
-    };
-
-    const handleHomeClick = (e) => {
-        e.preventDefault();
-        onHomeClick();
     };
 
     const handleCartClick = (e) => {
@@ -61,9 +32,9 @@ function ProductList({ onHomeClick }) {
         setShowCart(true);
     };
 
-    const handleContinueShopping = (e) => {
+    const handleHomeClick = (e) => {
         e.preventDefault();
-        setShowCart(false);
+        onHomeClick();
     };
 
     // Styling Objects
@@ -90,12 +61,26 @@ function ProductList({ onHomeClick }) {
                     <div>
                         <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
                             <h1 className='cart'>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" height="68" width="68">
-                                    <rect width="156" height="156" fill="none"></rect>
-                                    <circle cx="80" cy="216" r="12"></circle>
-                                    <circle cx="184" cy="216" r="12"></circle>
-                                    <path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                                </svg>
+                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" height="68" width="68">
+                                        <rect width="156" height="156" fill="none"></rect>
+                                        <circle cx="80" cy="216" r="12"></circle>
+                                        <circle cx="184" cy="216" r="12"></circle>
+                                        <path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+                                    </svg>
+                                    {/* Displaying the totalQuantity variable derived from Redux */}
+                                    <span className="cart_quantity_count" style={{
+                                        position: 'absolute',
+                                        top: '0',
+                                        right: '0',
+                                        backgroundColor: 'black',
+                                        borderRadius: '50%',
+                                        padding: '2px 8px',
+                                        fontSize: '16px'
+                                    }}>
+                                        {totalQuantity}
+                                    </span>
+                                </div>
                             </h1>
                         </a>
                     </div>
@@ -104,7 +89,6 @@ function ProductList({ onHomeClick }) {
 
             {!showCart ? (
                 <div className="product-container">
-                    {/* Task 2: Display Plant Details within product-grid */}
                     {plantsArray.map((category, index) => (
                         <div key={index}>
                             <h1 className="category-title">{category.category}</h1>
@@ -115,25 +99,5 @@ function ProductList({ onHomeClick }) {
                                         <div className="product-title">{plant.name}</div>
                                         <div className="product-description">{plant.description}</div>
                                         <div className="product-cost">{plant.cost}</div>
-                                        {/* Task 3 & 5: Add to Cart Button */}
                                         <button 
-                                            className="product-button" 
-                                            onClick={() => handleAddToCart(plant)}
-                                            disabled={addedToCart[plant.name]} // Disable if already added
-                                        >
-                                            {addedToCart[plant.name] ? "Added" : "Add to Cart"}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <CartItem onContinueShopping={handleContinueShopping} />
-            )}
-        </div>
-    );
-}
-
-export default ProductList;
+                                            className={`product-button ${addedToCart[plant.name]
