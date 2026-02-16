@@ -1,4 +1,4 @@
-"homepage": "https://your-username.github.io/e-plantShopping"
+
 {
   "name": "shoppingcart",
   "private": true,
@@ -28,6 +28,4 @@
     "vite": "^5.2.0"
   }
 }
-"predeploy": "npm run build"
 
-"deploy": "gh-pages -d dist"
