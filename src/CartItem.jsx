@@ -7,29 +7,47 @@ const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
-  // Calculate total amount for all products in the cart
+  // Task 3.1: Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
- 
+    return cart.reduce((total, item) => {
+      const numericCost = parseFloat(item.cost.substring(1));
+      return total + (numericCost * item.quantity);
+    }, 0);
   };
 
+  // Task 3.2: Return to plant listing page
   const handleContinueShopping = (e) => {
-   
+    onContinueShopping(e);
   };
 
+  // Task 3.3: Handle Checkout (Alert for future reference)
+  const handleCheckoutShopping = (e) => {
+    alert('Functionality to be added for future reference');
+  };
 
-
+  // Task 3.4: Increment quantity
   const handleIncrement = (item) => {
+    dispatch(updateQuantity({ name: item.name, quantity: item.quantity + 1 }));
   };
 
+  // Task 3.4: Decrement quantity with check for removal
   const handleDecrement = (item) => {
-   
+    if (item.quantity > 1) {
+      dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }));
+    } else {
+      dispatch(removeItem(item.name));
+    }
   };
 
+  // Task 3.5: Remove item from cart
   const handleRemove = (item) => {
+    dispatch(removeItem(item.name));
   };
 
-  // Calculate total cost based on quantity for an item
+  // Task 3.6: Calculate total cost for a specific item type
   const calculateTotalCost = (item) => {
+    const numericCost = parseFloat(item.cost.substring(1));
+    return numericCost * item.quantity;
   };
 
   return (
@@ -57,12 +75,10 @@ const CartItem = ({ onContinueShopping }) => {
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={(e) => handleCheckoutShopping(e)}>Checkout</button>
       </div>
     </div>
   );
 };
 
 export default CartItem;
-
-
